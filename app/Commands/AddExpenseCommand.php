@@ -35,7 +35,11 @@ class AddExpenseCommand extends Command
             $price = $this->ask('What is the expense price?');
         }
 
-        $expense = Expense::query()->create([
+        if (is_null($type)) {
+            $type = $this->ask('What is the expense type?');
+        }
+
+        Expense::query()->create([
             'name' => $name,
             'price' => $price,
             'type' => $type

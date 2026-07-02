@@ -32,4 +32,17 @@ describe('AddExpenseCommand', function () {
             ->expectsOutput('Expense added successfully')
             ->assertSuccessful();
     });
+
+    it('prompts for type if option is missing', function () {
+        $expense = Expense::factory()->raw();
+
+        $this->artisan('expense:add', [
+            'name' => $expense['name'],
+             '--price' => $expense['price'],
+//            '--type' => $expense['type']
+        ])
+            ->expectsQuestion('What is the expense type?', $expense['type'])
+            ->expectsOutput('Expense added successfully')
+            ->assertSuccessful();
+    });
 });
