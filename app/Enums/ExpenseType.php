@@ -10,5 +10,6 @@ enum ExpenseType: string
     case Utilities = 'Utilities';
     case Clothing = 'Clothing';
     case Health = 'Health';
+    case Food = 'Food';
     case Others = 'Others';
 }
