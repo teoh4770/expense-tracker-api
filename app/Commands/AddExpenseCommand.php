@@ -31,11 +31,17 @@ class AddExpenseCommand extends Command
         $price = $this->option('price');
         $type = $this->option('type');
 
+        if (is_null($price)) {
+            $price = $this->ask('What is the expense price?');
+        }
+
         $expense = Expense::query()->create([
             'name' => $name,
             'price' => $price,
             'type' => $type
         ]);
+
+        $this->info('Expense added successfully');
     }
 
     /**

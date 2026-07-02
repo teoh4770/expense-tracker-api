@@ -10,7 +10,7 @@ describe('AddExpenseCommand', function () {
             'name' => $expense['name'],
             '--price' => $expense['price'],
             '--type' => $expense['type']
-        ])->assertExitCode(0);
+        ])->assertSuccessful();
 
         $this->assertDatabaseCount('expenses', 1);
         $this->assertDatabaseHas('expenses', [
@@ -18,5 +18,18 @@ describe('AddExpenseCommand', function () {
             'price' => $expense['price'],
             'type' => $expense['type']
         ]);
+    });
+
+    it('prompts for price if option is missing', function () {
+        $expense = Expense::factory()->raw();
+
+        $this->artisan('expense:add', [
+            'name' => $expense['name'],
+            // '--price' => $expense['price'],
+            '--type' => $expense['type']
+        ])
+            ->expectsQuestion('What is the expense price?', $expense['price'])
+            ->expectsOutput('Expense added successfully')
+            ->assertSuccessful();
     });
 });
