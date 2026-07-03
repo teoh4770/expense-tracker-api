@@ -12,4 +12,11 @@ enum ExpenseType: string
     case Health = 'Health';
     case Food = 'Food';
     case Others = 'Others';
+
+    public static function values(): array
+    {
+        return array_map(function ($expenseType) {
+            return $expenseType->value;
+        }, ExpenseType::cases());
+    }
 }

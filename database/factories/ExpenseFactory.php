@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\ExpenseType;
-use App\Expense;
+use App\Models\Expense;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

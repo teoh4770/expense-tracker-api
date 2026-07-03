@@ -2,8 +2,11 @@
 
 namespace App\Commands;
 
-use App\Expense;
+use App\Enums\ExpenseType;
+use App\Models\Expense;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Enum;
 use LaravelZero\Framework\Commands\Command;
 
 class AddExpenseCommand extends Command
@@ -28,15 +31,22 @@ class AddExpenseCommand extends Command
     public function handle()
     {
         $name = $this->argument('name');
-        $price = $this->option('price');
-        $type = $this->option('type');
+        $price = $this->option('price') ?? $this->ask('What is the expense price?');
+        $type = $this->option('type') ?? $this->choice('What is the expense type?', ExpenseType::values());
 
-        if (is_null($price)) {
-            $price = $this->ask('What is the expense price?');
-        }
+        $validator = Validator::make([
+            'name' => $name,
+            'price' => $price,
+            'type' => $type
+        ], [
+            'name' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'type' => ['required', new Enum(ExpenseType::class)],
+        ]);
 
-        if (is_null($type)) {
-            $type = $this->ask('What is the expense type?');
+        if ($validator->fails()) {
+            $this->error('One of the validation for name, price, type failed');
+            return Command::FAILURE;
         }
 
         Expense::query()->create([
@@ -46,6 +56,8 @@ class AddExpenseCommand extends Command
         ]);
 
         $this->info('Expense added successfully');
+
+        return Command::SUCCESS;
     }
 
     /**
