@@ -2,6 +2,7 @@
 
 namespace App\Commands;
 
+use App\Actions\AddExpenseAction;
 use App\Enums\ExpenseType;
 use App\Models\Expense;
 use Illuminate\Console\Scheduling\Schedule;
@@ -28,35 +29,26 @@ class AddExpenseCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(AddExpenseAction $addExpenseAction)
     {
         $name = $this->argument('name');
         $price = $this->option('price') ?? $this->ask('What is the expense price?');
         $type = $this->option('type') ?? $this->choice('What is the expense type?', ExpenseType::values());
 
-        $validator = Validator::make([
+        $errors = $addExpenseAction->execute([
             'name' => $name,
             'price' => $price,
             'type' => $type
-        ], [
-            'name' => ['required', 'string', 'max:255'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'type' => ['required', new Enum(ExpenseType::class)],
         ]);
 
-        if ($validator->fails()) {
-            $this->error('One of the validation for name, price, type failed');
+        if (! empty($errors)) {
+            foreach ($errors as $error) {
+                $this->error($error);
+            }
             return Command::FAILURE;
         }
 
-        Expense::query()->create([
-            'name' => $name,
-            'price' => $price,
-            'type' => $type
-        ]);
-
         $this->info('Expense added successfully');
-
         return Command::SUCCESS;
     }
 

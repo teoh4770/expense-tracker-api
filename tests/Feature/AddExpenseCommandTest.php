@@ -47,23 +47,23 @@ describe('AddExpenseCommand', function () {
             ->assertSuccessful();
     });
 
-    it('exit if one of the required arguments or options is invalid', function (string $name, mixed $price, mixed $type) {
+    it('exit if one of the required arguments or options is invalid', function (string $name, mixed $price, mixed $type, string $expectedError) {
         $this->artisan('expense:add', [
             'name' => $name,
             '--price' => $price,
             '--type' => $type
         ])
-            ->expectsOutput('One of the validation for name, price, type failed')
+            ->expectsOutput($expectedError)
             ->assertFailed();
 
         $this->assertDatabaseMissing('expenses', [
             'name' => $name
         ]);
     })->with([
-        'name too long' => [str_repeat('a', 256), 10, ExpenseType::Food->value],
-        'price is negative' => ['Valid Name', -5, ExpenseType::Food->value],
-        'price is not numeric' => ['Valid Name', 'abc', ExpenseType::Food->value],
-        'empty type' => ['Valid Name', 10, ''],
-        'invalid type' => ['Valid Name', 10, 'wrong type']
+        'name too long' => [str_repeat('a', 256), 10, ExpenseType::Food->value, 'The name field must not be greater than 255 characters.'],
+        'price is negative' => ['Valid Name', -5, ExpenseType::Food->value, 'The price field must be at least 0.'],
+        'price is not numeric' => ['Valid Name', 'abc', ExpenseType::Food->value, 'The price field must be a number.'],
+        'empty type' => ['Valid Name', 10, '', 'The type field is required.'],
+        'invalid type' => ['Valid Name', 10, 'wrong type', 'The selected type is invalid.']
     ]);
 });
