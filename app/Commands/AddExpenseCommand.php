@@ -4,10 +4,7 @@ namespace App\Commands;
 
 use App\Actions\AddExpenseAction;
 use App\Enums\ExpenseType;
-use App\Models\Expense;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rules\Enum;
 use LaravelZero\Framework\Commands\Command;
 
 class AddExpenseCommand extends Command

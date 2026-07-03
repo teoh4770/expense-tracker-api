@@ -6,7 +6,6 @@ use App\Enums\ExpenseType;
 use App\Models\Expense;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
-use LaravelZero\Framework\Commands\Command;
 
 class AddExpenseAction
 {
