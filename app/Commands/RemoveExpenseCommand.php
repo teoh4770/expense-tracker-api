@@ -14,7 +14,7 @@ class RemoveExpenseCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'expense:remove {id?}';
+    protected $signature = 'expense:remove {id? : The id of expense}';
 
     /**
      * The console command description.
@@ -38,7 +38,6 @@ class RemoveExpenseCommand extends Command
 
             return Command::FAILURE;
         }
-
 
         $this->info('Expense deleted successfully');
         return Command::SUCCESS;
