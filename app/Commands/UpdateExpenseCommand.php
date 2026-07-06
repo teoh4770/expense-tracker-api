@@ -35,11 +35,36 @@ class UpdateExpenseCommand extends Command
         $price = $this->option('price');
         $type = $this->option('type');
 
+        $expenses = Expense::query()->get();
+        $options = $expenses->map(function (Expense $expense) {
+            return "$expense->id - $expense->name ({$expense->created_at->format('Y-m-d')})";
+        });
+
+        if (empty($id)) {
+            $selected = $this->choice('Which expense do you wanna update?', $options->toArray());
+            $id = explode(' - ', $selected)[0];
+        }
+
+        if (empty($name)) {
+            $name = $this->ask('What is the name of the expense?');
+        }
+
+        if (empty($price)) {
+            $price = $this->ask('What is the price of the expense?');
+        }
+
+        if (empty($type)) {
+            $type = $this->ask('What is the type of the expense?');
+        }
+
         $updateExpenseAction->execute($id, [
             'name' => $name,
             'price' => $price,
             'type' => $type
         ]);
+
+        $this->info('Expense updated successfully');
+        return Command::SUCCESS;
     }
 
     /**
