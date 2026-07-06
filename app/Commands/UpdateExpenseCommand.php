@@ -3,6 +3,7 @@
 namespace App\Commands;
 
 use App\Actions\AddExpenseAction;
+use App\Actions\UpdateExpenseAction;
 use App\Enums\ExpenseType;
 use App\Models\Expense;
 use Illuminate\Console\Scheduling\Schedule;
@@ -27,20 +28,18 @@ class UpdateExpenseCommand extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(UpdateExpenseAction $updateExpenseAction)
     {
         $id = $this->argument('id');
         $name = $this->option('name');
         $price = $this->option('price');
         $type = $this->option('type');
 
-        Expense::query()
-            ->findOrFail($id)
-            ->update([
-                'name' => $name,
-                'price' => $price,
-                'type' => $type
-            ]);
+        $updateExpenseAction->execute($id, [
+            'name' => $name,
+            'price' => $price,
+            'type' => $type
+        ]);
     }
 
     /**
