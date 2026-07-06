@@ -30,32 +30,10 @@ class UpdateExpenseCommand extends Command
      */
     public function handle(UpdateExpenseAction $updateExpenseAction)
     {
-        $id = $this->argument('id');
-        $name = $this->option('name');
-        $price = $this->option('price');
-        $type = $this->option('type');
-
-        $expenses = Expense::query()->get();
-        $options = $expenses->map(function (Expense $expense) {
-            return "$expense->id - $expense->name ({$expense->created_at->format('Y-m-d')})";
-        });
-
-        if (empty($id)) {
-            $selected = $this->choice('Which expense do you wanna update?', $options->toArray());
-            $id = explode(' - ', $selected)[0];
-        }
-
-        if (empty($name)) {
-            $name = $this->ask('What is the name of the expense?');
-        }
-
-        if (empty($price)) {
-            $price = $this->ask('What is the price of the expense?');
-        }
-
-        if (empty($type)) {
-            $type = $this->ask('What is the type of the expense?');
-        }
+        $id = $this->argument('id') ?? $this->chooseFromExpenseList();
+        $name = $this->option('name') ?? $this->ask('What is the name of the expense?');
+        $price = $this->option('price') ?? $this->ask('What is the price of the expense?');
+        $type = $this->option('type') ?? $this->ask('What is the type of the expense?');
 
         $updateExpenseAction->execute($id, [
             'name' => $name,
@@ -73,5 +51,26 @@ class UpdateExpenseCommand extends Command
     public function schedule(Schedule $schedule): void
     {
         // $schedule->command(static::class)->everyMinute();
+    }
+
+    private function chooseFromExpenseList(): int
+    {
+        $expenses = Expense::query()->get();
+
+        if ($expenses->isEmpty()) {
+            $this->info('There are no expenses to remove.');
+            return Command::SUCCESS;
+        }
+
+        $options = $expenses->map(function (Expense $expense) {
+            return "$expense->id - $expense->name - {$expense->created_at->format('Y-m-d')}";
+        });
+
+        $selected = $this->choice(
+            'Which expense do you wanna update?',
+            $options->toArray()
+        );
+
+        return explode(' - ', $selected)[0];
     }
 }
